@@ -207,7 +207,7 @@ class NotesApp extends React.Component<Props> {
           <Menu
             style={areaStyle}
             buttonStyle={buttonStyle}
-            requiresSave={this.props.activeNote && this.props.activeNote.text === this.state.currentNote}
+            requiresSave={!(this.props.activeNote && this.props.activeNote.text === this.state.currentNote)}
             saveAndSelectNote={this.saveAndSelectNote}
             toggleDrawer={this.toggleDrawer}
             clearNote={this.clearNote}
