@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { RootState, RootAction } from './Redux/Types'
 import Modal from 'react-modal'
+import hotkeys from 'hotkeys-js'
+
 import AppActions, { AppState, Note } from './Redux/Redux'
+import { RootState, RootAction } from './Redux/Types'
 
 import Tooltip from '@material-ui/core/Tooltip'
 import * as Icons from '@material-ui/icons'
@@ -16,7 +18,7 @@ import './Components/Styles/Styles.css'
 
 const menuStyle = {background: '#2935ff', color: 'white', display: 'flex'}
 const areaStyle = {width: '96vw', maxWidth: '100%', padding: '2vw' }
-const buttonStyle = {background: '#3527ff', padding: 5, color: 'white', marginRight: 4, cursor: 'pointer'}
+const buttonStyle = {background: '#2935ff', padding: 5, color: 'white', marginRight: 4, cursor: 'pointer'}
 const modalStyle: Modal.Styles = {
   content : {
     top                   : '50%',
@@ -58,6 +60,7 @@ class NotesApp extends React.Component<Props> {
     }
   }
   componentDidMount() {
+    this.setupHotkeys()
     this.updateWindowDimensions()
     window.addEventListener('resize', this.updateWindowDimensions)
   }
@@ -70,6 +73,21 @@ class NotesApp extends React.Component<Props> {
     this.setState({ width: window.innerWidth, height: window.innerHeight })
   }
 
+  setupHotkeys = () => {
+    hotkeys.filter = function(event){
+      var tagName = (event.target || event.srcElement || {}).tagName || ''
+      hotkeys.setScope(/^(INPUT|TEXTAREA|SELECT)$/.test(tagName) ? 'input' : 'other');
+      return true;
+    }
+    hotkeys('ctrl+enter,command+enter', (event) => {
+      event.preventDefault()
+      if (this.state.currentNote !== '') {
+        this.props.saveNote(this.state.currentNote, true)
+      }
+      return false
+    })
+  }
+  
   updateCurrentNote = (currentNote: string) => {
     this.setState({currentNote})
   }
@@ -237,7 +255,7 @@ class NotesApp extends React.Component<Props> {
                 <p className={'text'} dangerouslySetInnerHTML={{__html: this.props.modalText}} />
               </div>
               <div style={{display: 'flex', justifyContent: 'center', paddingTop: 15, cursor: 'pointer'}}>
-                <a className={'header'} style={{color: '#3527ff'}} onClick={() => { this.setState({runInOfflineMode: true}) }}>Ignore</a>
+                <a className={'header'} style={{color: '#2935ff'}} onClick={() => { this.setState({runInOfflineMode: true}) }}>Ignore</a>
               </div>
           </div>
         </Modal>

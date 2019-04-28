@@ -20,7 +20,7 @@ export default class AppMenu extends React.Component<ScreenProps, object> {
       )
     } else {
       return (
-        <Icons.CloudUpload onClick={this.props.saveAndSelectNote} style={this.props.buttonStyle} />
+        <Icons.CloudUpload onClick={this.props.saveAndSelectNote} style={{...this.props.buttonStyle, background: '#ff1c3f'}} />
       )
     }
   }
@@ -36,7 +36,7 @@ export default class AppMenu extends React.Component<ScreenProps, object> {
           <Tooltip title={'New'}>
             <Icons.FiberNew onClick={this.props.clearNote} style={this.props.buttonStyle} />
           </Tooltip>
-          <Tooltip title={'Save'}>
+          <Tooltip title={'Save (command+enter)'}>
             {this.cloudUpdateIcon()}
           </Tooltip>
       </div>

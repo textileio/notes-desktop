@@ -10,7 +10,6 @@ interface ScreenProps {
 }
 class NotesList extends React.Component<ScreenProps> {
   renderNote = (note: Note, index: number) => {
-    const borderTop = index > 0 ? '0.5px solid rgba(255, 255, 255, 0.2)' : undefined
     const noteStyle: React.CSSProperties = {
       padding: 0,
       margin: 0,

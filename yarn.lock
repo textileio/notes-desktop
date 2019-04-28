@@ -2815,6 +2815,11 @@ homedir-polyfill@^1.0.1:
   dependencies:
     parse-passwd "^1.0.0"
 
+hotkeys-js@^3.6.2:
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/hotkeys-js/-/hotkeys-js-3.6.2.tgz#4c44384cd71f51b7f208e08322d908fe34ec18f4"
+  integrity sha512-CAO6dCycIRyxabrCx8ZW2MoEmNrHdGoYKN1WBw+DY/YdVvPhECGi7E4IIfCjOkaxbRLCik2TOYWox2EDHYPduw==
+
 hpack.js@^2.1.6:
   version "2.1.6"
   resolved "https://registry.yarnpkg.com/hpack.js/-/hpack.js-2.1.6.tgz#87774c0949e513f42e84575b3c45681fade2a0b2"
