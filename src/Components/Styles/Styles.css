@@ -1,0 +1,39 @@
+@font-face {
+  font-family: 'Biotif-Regular';
+  font-style: 'normal';
+  font-weight: 300;
+  src:
+    local('Biotif'),
+    local('Biotif-Regular'),
+    url('./font/Biotif-Regular.ttf') format('ttf');
+}
+
+@font-face {
+  font-family: 'Biotif-Medium';
+  font-style: 'normal';
+  font-weight: 500;
+  src:
+    local('Biotif Medium'),
+    local('Biotif-Medium'),
+    url('./font/Biotif-Medium.ttf') format('ttf');
+}
+
+@font-face {
+  font-family: 'Biotif-Bold';
+  font-style: 'normal';
+  font-weight: 700;
+  src:
+    local('Biotif Bold'),
+    local('Biotif-Bold'),
+    url('./font/Biotif-Bold.ttf') format('ttf');
+}
+
+.header {
+  font-family: 'Biotif-Bold';
+}
+.title {
+  font-family: 'Biotif-Medium';
+}
+.text {
+  font-family: 'Biotif-Regular';
+}
