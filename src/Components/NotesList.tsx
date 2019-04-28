@@ -17,7 +17,7 @@ class NotesList extends React.Component<ScreenProps> {
       paddingTop: '1em',
       marginBottom: '1em',
       minHeight: '1.4em',
-      maxHeight: '3.5em',
+      maxHeight: '3.6em',
       lineHeight: '1.4em',
       overflow: 'hidden',
       cursor: 'pointer'
