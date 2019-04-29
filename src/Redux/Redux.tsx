@@ -1,6 +1,7 @@
 // action types
 import { createAction, ActionType, getType } from 'typesafe-actions'
 import { RootState } from './Types'
+import { Value } from 'slate';
 
 const actions = {
   logout: createAction('app/LOGOUT'),
@@ -23,6 +24,9 @@ const actions = {
   }),
   selectNote: createAction('app/SelectNote', (resolve) => {
     return (note: Note) => resolve({note})
+  }),
+  updateActiveNote: createAction('app/UpdateActiveNote', (resolve) => {
+    return (value: Value) => resolve({value})
   }),
   saveNote: createAction('app/SaveNote', (resolve) => {
     return (note: string, select?: boolean) => resolve({note, select})
@@ -48,11 +52,17 @@ export type AppActions = ActionType<typeof actions>
 
 export interface Note {
   key: string
-  text: string
+  json: any
   created: number
   updated: number
   block?: string
   threadId?: string
+}
+
+// ActiveNote is different since we want to hang onto a UI ready value + an old block ID we should delete if we save
+export interface ActiveNote extends Note {
+  value: Value
+  refBlock?: string
 }
 
 export interface AppState {
@@ -61,7 +71,7 @@ export interface AppState {
     notes: ReadonlyArray<Note>
     pendingDeletes: ReadonlyArray<string>
     appThreadId?: string
-    activeNote?: Note
+    activeNote?: ActiveNote
     name?: string
     unsynced?: boolean
 }
@@ -98,6 +108,23 @@ export function reducer(state: AppState = initialState, action: AppActions): App
     }
     case getType(actions.setThreadId): {
       return {...state, appThreadId: action.payload.threadId}
+    }
+    case getType(actions.updateActiveNote): {
+      const { value } = action.payload
+      const updated = (new Date).getTime()
+      const activeNote = state.activeNote || {
+        key: String(updated) + String(value.hashCode()),
+        value,
+        updated,
+        created: updated,
+        json: {}
+      }
+      if (activeNote) {
+        activeNote.value = value
+        activeNote.updated = updated
+      } else {
+
+      }
     }
     case getType(actions.addOrUpdate): {
       const { note } = action.payload

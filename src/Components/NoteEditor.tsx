@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { Editor } from 'slate-react'
 import { Value } from 'slate'
-import Slate from './Slate'
+import NoteArea from './NoteArea'
 import './Styles/Styles.css'
 
 
@@ -35,14 +34,15 @@ interface NoteEditorState {
 }
 
 interface ScreenProps {
-  note: string
-  onChange: (text: string) => void
+  note?: any
+  onChange?: any
+  style?: any
 }
 
 class NoteEditor extends React.Component<ScreenProps> {
   state: NoteEditorState = { value: initialValue, width: 0, height: 0 }
 
-  textarea?: HTMLTextAreaElement
+  notearea?: NoteArea
 
   constructor(props: any) {
     super(props)
@@ -63,7 +63,7 @@ class NoteEditor extends React.Component<ScreenProps> {
   }
 
   noteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    this.props.onChange(event.target.value)
+    // this.props.onChange(event.target.value)
   }
 
   // On change, update the app's React state with the new editor value.
@@ -72,8 +72,7 @@ class NoteEditor extends React.Component<ScreenProps> {
   }
   
   public focus() {
-    if (this.textarea) {
-      this.textarea.focus()
+    if (this.notearea) {
     }
   }
 
@@ -98,7 +97,7 @@ class NoteEditor extends React.Component<ScreenProps> {
     }
     return (
       <div>
-        <Slate style={areaStyle} />
+        demo
       </div>
     )
   }

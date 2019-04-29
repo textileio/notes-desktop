@@ -34,7 +34,7 @@ export default class AppMenu extends React.Component<ScreenProps, object> {
             <Icons.Delete onClick={this.props.deleteNote} style={this.props.buttonStyle} />
           </Tooltip>
           <Tooltip title={'New'}>
-            <Icons.FiberNew onClick={this.props.clearNote} style={this.props.buttonStyle} />
+            <Icons.FormatClear onClick={this.props.clearNote} style={this.props.buttonStyle} />
           </Tooltip>
           <Tooltip title={'Save (command+enter)'}>
             {this.cloudUpdateIcon()}

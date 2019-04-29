@@ -11,8 +11,11 @@ import Tooltip from '@material-ui/core/Tooltip'
 import * as Icons from '@material-ui/icons'
 import Drawer from './Components/Drawer'
 import NotesList from './Components/NotesList'
+import NoteArea from './Components/NoteArea'
 import NoteEditor from './Components/NoteEditor'
 import Menu from './Components/Menu'
+
+import { Value, ValueJSON } from 'slate'
 
 import './Components/Styles/Styles.css'
 
@@ -30,10 +33,92 @@ const modalStyle: Modal.Styles = {
   }
 }
 
+const initialValue = Value.fromJSON({
+  //@ts-ignore
+  "document": {
+    "nodes": [
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text":
+                  "The editor gives you full control over the logic you can add. For example, it's fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with \"> \" you get a blockquote that looks like this:"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "block-quote",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text": "A wise quote."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text":
+                  "Order when you start a line with \"## \" you get a level-two heading, like this:"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "heading-two",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text": "Try it out!"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text":
+                  "Try it out for yourself! Try starting a new line with \">\", \"-\", or \"#\"s."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+})
+
+
 interface ComponentState {
   runInOfflineMode: boolean
   isDrawerOpen: boolean
-  currentNote: string
+  currentNote: Value
   width: number
   height: number
   update: number
@@ -45,19 +130,19 @@ class NotesApp extends React.Component<Props> {
   state: ComponentState = {
     runInOfflineMode: false,
     isDrawerOpen: true,
-    currentNote: '',
+    currentNote: initialValue,
     width: 0,
     height: 0,
     update: 0
   }
 
-  noteEditor?: NoteEditor
   componentDidUpdate(prevProps: Props) {
-    if (this.props.activeNote && this.state.currentNote === '') {
-      this.setState({
-        currentNote: this.props.activeNote.text
-      })
-    }
+    // TODO
+    // if (this.props.activeNote && this.state.currentNote === initialValue) {
+    //   this.setState({
+    //     currentNote: initialValue // TODO: this.props.activeNote.text
+    //   })
+    // }
   }
   componentDidMount() {
     this.setupHotkeys()
@@ -81,15 +166,16 @@ class NotesApp extends React.Component<Props> {
     }
     hotkeys('ctrl+enter,command+enter', (event) => {
       event.preventDefault()
-      if (this.state.currentNote !== '') {
-        this.props.saveNote(this.state.currentNote, true)
+      if (this.state.currentNote !== initialValue) {
+        // TODO
+        // this.props.saveNote(this.state.currentNote, true)
       }
       return false
     })
   }
   
-  updateCurrentNote = (currentNote: string) => {
-    this.setState({currentNote})
+  updateCurrentNote = (currentNote: Value) => {
+    this.setState({currentNote: currentNote })
   }
 
   toggleDrawer = () => {
@@ -103,34 +189,37 @@ class NotesApp extends React.Component<Props> {
   }
 
   focusNote = () => {
-    if (this.noteEditor) {
-      this.noteEditor.focus()
-    }
+    // if (this.noteEditor) {
+      // TODO
+      // this.noteEditor.focus()
+    // }
   }
 
   selectNote = (note: Note) => {
-    this.setState({currentNote: ''})
+    this.setState({currentNote: initialValue})
     this.props.selectNote(note)
     this.toggleDrawer()
     this.focusNote()
   }
   clearNote = () => {
     this.props.clearNote()
-    this.setState({currentNote: '', isDrawerOpen: false})
+    this.setState({currentNote: initialValue, isDrawerOpen: false})
   }
   saveAndSelectNote = () => {
-    if (this.state.currentNote !== '') {
-      this.props.saveNote(this.state.currentNote, true)
+    if (this.state.currentNote !== initialValue) {
+      // TODO
+      // this.props.saveNote(this.state.currentNote, true)
       this.setState({isDrawerOpen: false})
       this.focusNote()
     }
   }
   saveAndClearNote = () => {
-    if (this.state.currentNote !== '') {
-      this.props.saveNote(this.state.currentNote)
+    if (this.state.currentNote !== initialValue) {
+      //TODO
+      // this.props.saveNote(this.state.currentNote)
       setTimeout(() => {
         // ActiveNote wont get cleared for a moment, so just needs to wait for a second
-        this.setState({currentNote: '', isDrawerOpen: false})
+        this.setState({currentNote: initialValue, isDrawerOpen: false})
       }, 500)
     }
   }
@@ -139,14 +228,14 @@ class NotesApp extends React.Component<Props> {
     this.props.deleteNote()
     setTimeout(() => {
       // ActiveNote wont get cleared for a moment, so just needs to wait for a second
-      this.setState({currentNote: '',  isDrawerOpen: false})
+      this.setState({currentNote: initialValue,  isDrawerOpen: false})
       this.focusNote()
     }, 500)
   }
 
   logout = () => {
     this.props.logout()
-    this.setState({currentNote: ''})
+    this.setState({currentNote: initialValue})
   }
 
   renderInnerDrawer = () => {
@@ -200,6 +289,17 @@ class NotesApp extends React.Component<Props> {
 
     const menuWidth = this.state.width > 1000 ? '30%' : '300px'
     
+    const textAreaStyle = {
+      width: '96vw', 
+      maxWidth: 745,
+      height: '90%',  
+      resize: 'none' as 'none', 
+      padding: '2vw', 
+      border: 'none' 
+    }
+    // TODO
+    const requiresSave = true// !(this.props.activeNote && this.props.activeNote.text === this.state.currentNote)
+
     return (
       <div style={{display: 'flex', flexDirection: 'column', padding: 0, margin: 0}}>
 
@@ -207,7 +307,7 @@ class NotesApp extends React.Component<Props> {
           <Menu
             style={areaStyle}
             buttonStyle={buttonStyle}
-            requiresSave={!(this.props.activeNote && this.props.activeNote.text === this.state.currentNote)}
+            requiresSave={requiresSave}
             saveAndSelectNote={this.saveAndSelectNote}
             toggleDrawer={this.toggleDrawer}
             clearNote={this.clearNote}
@@ -216,13 +316,13 @@ class NotesApp extends React.Component<Props> {
         </div>
 
         <div style={{display: 'flex', flex: 1, justifyContent: 'center', alignContent: 'center' }}>
-            <NoteEditor
-              note={this.state.currentNote}
+          <div>
+            <NoteArea
+              value={this.state.currentNote}
               onChange={this.updateCurrentNote}
-              ref={(input) => {
-                this.noteEditor = input || undefined
-              }}
+              style={textAreaStyle}
             />
+          </div>
         </div>
 
         <div>
