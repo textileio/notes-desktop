@@ -159,6 +159,7 @@ class NotesApp extends React.Component<Props> {
   }
 
   setupHotkeys = () => {
+    // TODO check if working
     hotkeys.filter = function(event){
       var tagName = (event.target || event.srcElement || {}).tagName || ''
       hotkeys.setScope(/^(INPUT|TEXTAREA|SELECT)$/.test(tagName) ? 'input' : 'other');
