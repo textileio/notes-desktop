@@ -88,7 +88,14 @@ class NoteEditor extends React.Component<ScreenProps> {
 // />
 // <Editor style={areaStyle} value={this.state.value} onChange={this.onChange} />
   public render(): React.ReactNode {
-    const areaStyle = {width: '96vw', height: '90%',  maxWidth: '100%', resize: 'none' as 'none', padding: '2vw', border: 'none' }
+    const areaStyle = {
+      width: '96vw', 
+      maxWidth: 745,
+      height: '90%',  
+      resize: 'none' as 'none', 
+      padding: '2vw', 
+      border: 'none' 
+    }
     return (
       <div>
         <Slate style={areaStyle} />
