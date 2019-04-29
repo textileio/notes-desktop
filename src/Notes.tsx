@@ -215,7 +215,7 @@ class NotesApp extends React.Component<Props> {
           />
         </div>
 
-        <div style={{display: 'flex', flex: 1 }}>
+        <div style={{display: 'flex', flex: 1, justifyContent: 'center', alignContent: 'center' }}>
             <NoteEditor
               note={this.state.currentNote}
               onChange={this.updateCurrentNote}
