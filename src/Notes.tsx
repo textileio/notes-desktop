@@ -229,11 +229,11 @@ class NotesApp extends React.Component<Props> {
             }}
             pairingRequest={this.displayQRCode}
             selectNote={this.selectNote}
+            showQRCodeLink={!this.props.showSyncIssue}
           />
         </div> 
         
         <QRCodeInvite
-          visible={!this.props.showSyncIssue}
           onDismiss={() => { this.setState({displayQRCode: false}) }}
           isOpen={this.state.displayQRCode}
           style={modalStyle}

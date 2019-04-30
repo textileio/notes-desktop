@@ -12,7 +12,6 @@ import './Styles/Styles.css'
 
 
 interface ScreenProps {
-  visible: boolean
   isOpen: boolean
   onDismiss: () => void
   style?: Modal.Styles
@@ -48,11 +47,6 @@ class QRCodeInvite extends React.Component<Props> {
     )
   }
   render () {
-    if (!this.props.visible) {
-      return (
-        <div></div>
-      )
-    }
     const el = document.getElementById('main') || {}
     return (
       <Modal

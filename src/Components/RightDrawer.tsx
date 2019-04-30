@@ -19,6 +19,7 @@ interface ScreenProps {
   name: string
   width: string | undefined
   style: React.CSSProperties
+  showQRCodeLink: boolean
   selectNote: (note: Note) => void
   onClose: () => void
   pairingRequest: () => void
@@ -27,6 +28,17 @@ interface ScreenProps {
 
 type Props = ScreenProps & UIProps
 class RightDrawer extends React.Component<Props> {
+
+  qrCodeLink = () => {
+    if (!this.props.showQRCodeLink) {
+      return (<div></div>)
+    }
+    return (
+      <Tooltip title={'Pair with Textile mobile.'}>
+        <Icons.MobileScreenShare style={{...buttonStyle, background: 'none', color: 'white'}} onClick={this.props.pairingRequest} />
+      </Tooltip>
+    )
+  }
 
   renderInnerDrawer = () => {
     const displayName = this.props.name && this.props.name !== '' ? this.props.name : 'Disconnected'
@@ -44,9 +56,7 @@ class RightDrawer extends React.Component<Props> {
         />
 
         <div style={{display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', zIndex: 1000}}>
-            <Tooltip title={'Pair with Textile mobile.'}>
-              <Icons.MobileScreenShare style={{...buttonStyle, background: 'none', color: 'white'}} onClick={this.props.pairingRequest} />
-            </Tooltip>
+          {this.qrCodeLink()}
           <a href="https://textile.io" target="_blank" style={{display: 'flex', paddingTop: 10}}>
             <img src="https://gateway.textile.cafe/ipfs/QmarZwQEri4g2s8aw9CWKhxAzmg6rnLawGuSGYLSASEow6/0/d" width={30} height={30} />
           </a>
