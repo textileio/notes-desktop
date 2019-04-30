@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import Modal from 'react-modal'
-import hotkeys from 'hotkeys-js'
 
 import AppActions, { AppState, Note } from './Redux/Redux'
 import { RootState, RootAction } from './Redux/Types'
@@ -13,8 +12,11 @@ import Drawer from './Components/Drawer'
 import NotesList from './Components/NotesList'
 import NoteArea from './Components/NoteArea'
 import Menu from './Components/Menu'
+import QRCodeInvite from './Components/QRCodeInvite'
+import RightDrawer from './Components/RightDrawer'
 
-import { Value, SchemaProperties } from 'slate'
+//@ts-ignore
+import { Value } from 'slate'
 
 import './Components/Styles/Styles.css'
 
@@ -32,7 +34,7 @@ const modalStyle: Modal.Styles = {
   }
 }
 
-const defaultValue = Value.fromJSON({
+export const defaultValue = Value.fromJSON({
   "object": "value",
   "document": {
     "object": "document",
@@ -67,12 +69,14 @@ interface ComponentState {
   height: number
   update: number
   currentNote?: Value
+  displayQRCode: boolean
 }
 
 type Props = ScreenDispatch & UIProps
 class NotesApp extends React.Component<Props> {
 
   state: ComponentState = {
+    displayQRCode: false,
     runInOfflineMode: false,
     isDrawerOpen: true,
     width: 0,
@@ -81,7 +85,6 @@ class NotesApp extends React.Component<Props> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    console.log(this.state.currentNote)
     if (!this.state.currentNote && this.props.activeNote && this.props.activeNote.value) {
       this.setState({currentNote: Value.fromJSON(this.props.activeNote.value)})
     }
@@ -100,8 +103,6 @@ class NotesApp extends React.Component<Props> {
   }
   
   updateCurrentNote = (currentNote: Value) => {
-    console.log(currentNote)
-    console.log(currentNote === defaultValue)
     this.props.updateCurrentNote(currentNote)
     this.setState({currentNote: currentNote })
   }
@@ -127,7 +128,6 @@ class NotesApp extends React.Component<Props> {
       this.setState({isDrawerOpen: false})
     }
   }
-
   deleteNote = () => {
     this.props.deleteNote()
     setTimeout(() => {
@@ -140,39 +140,16 @@ class NotesApp extends React.Component<Props> {
     this.props.logout()
     this.setState({currentNote: defaultValue})
   }
-
-  renderInnerDrawer = () => {
-    const displayName = this.props.name && this.props.name !== '' ? this.props.name : 'Disconnected'
-    return (
-      <div style={{display: 'flex', flex: 1, height: '100%', flexDirection: 'column'}}>
-
-        <div style={{display: 'flex', paddingBottom: 10}}>
-          <div className={'text'} style={{flex: 1, marginLeft: 20, color: '#9492de', textAlign: 'right'}}>{displayName}</div>
-        </div>
-
-        <NotesList
-          style={{flex: 1, paddingTop: 20}}
-          notes={this.props.notes.map((note) => note)}      
-          selectNote={this.selectNote}        
-        />
-
-        <a href="https://textile.io" target="_blank" style={{display: 'flex', paddingTop: 10, alignItems: 'flex-end', justifyContent: 'flex-end'}}>
-          <img src="https://gateway.textile.cafe/ipfs/QmarZwQEri4g2s8aw9CWKhxAzmg6rnLawGuSGYLSASEow6/0/d" width={30} height={30} />
-        </a>
-      </div>
-    )
+  displayQRCode = () => {
+    this.setState({displayQRCode: true})
   }
 
   syncWarning = () => {
     if (this.props.showSyncIssue) {
       return (
-        <div style={{display: 'flex', flexDirection: 'row', margin: 0}}>
-          <div style={{...areaStyle, zIndex: 100}} >
-            <Tooltip title={'Unable to reach your Textile account.'}>
-              <Icons.SyncProblem style={{...buttonStyle, background: 'none', color: 'gray', zIndex: 100}} />
-            </Tooltip>
-          </div>
-        </div>
+        <Tooltip title={'Unable to reach your Textile account.'}>
+          <Icons.SyncProblem style={{...buttonStyle, background: 'none', color: 'gray', zIndex: 2000}} />
+        </Tooltip>
       )
     }
     return
@@ -188,7 +165,12 @@ class NotesApp extends React.Component<Props> {
   }
 
   getNotePad = () => {
-    const displayValue = this.state.currentNote || defaultValue
+    if (!this.props.connection) {
+      return
+    }
+    const displayValue = this.state.currentNote || 
+      (this.props.activeNote && this.props.activeNote.value ? Value.fromJSON(this.props.activeNote.value) : defaultValue)
+
     const textAreaStyle = {
       width: '96vw', 
       maxWidth: 745,
@@ -196,7 +178,8 @@ class NotesApp extends React.Component<Props> {
       height: '90%',  
       resize: 'none' as 'none', 
       padding: '2vw', 
-      border: 'none' 
+      border: 'none',
+      color: '#2b2b2b'
     }
     return (
       <div>
@@ -209,14 +192,11 @@ class NotesApp extends React.Component<Props> {
     )
   }
   public render(): React.ReactNode {
-
     const el = document.getElementById('main') || {}
-
     const menuWidth = this.state.width > 1000 ? '30%' : '300px'
 
     return (
       <div style={{display: 'flex', flexDirection: 'column', padding: 0, margin: 0}}>
-
         <div style={{display: 'flex', flexDirection: 'row', margin: 0, zIndex: 100}}>
           <Menu
             style={areaStyle}
@@ -229,26 +209,35 @@ class NotesApp extends React.Component<Props> {
             showSyncIssue={this.props.showSyncIssue}
           />
         </div>
-
         <div style={{display: 'flex', flex: 1, justifyContent: 'center', alignContent: 'center', overflow: 'scroll' }}>
           {this.getNotePad()}
         </div>
+        <div style={{display: 'flex', flexDirection: 'row', margin: 0, background: 'none'}}>
+          <div style={{width: '96vw', maxWidth: '100%', paddingLeft: '2vw', paddingBottom: '2vw', background: 'none'}} >
+              {this.syncWarning()}
+          </div>
+        </div>
 
         <div>
-          <Drawer
-            isOpen={ this.state.isDrawerOpen }
-            from='right'
+          <RightDrawer
+            isOpen={this.state.isDrawerOpen}
+            name={'display'}
             width={menuWidth}
             style={menuStyle}
-            onRequestClose={ () => {
-                this.setState({ isDrawerOpen: false })
-            } }>
-            {this.renderInnerDrawer()}
-          </Drawer>
-
-          {this.syncWarning()}
-
+            onClose={() => {
+              this.setState({ isDrawerOpen: false })
+            }}
+            pairingRequest={this.displayQRCode}
+            selectNote={this.selectNote}
+          />
         </div> 
+        
+        <QRCodeInvite
+          onDismiss={() => { this.setState({displayQRCode: false}) }}
+          isOpen={this.state.displayQRCode}
+          style={modalStyle}
+        />
+
         <Modal
           appElement={el}
           isOpen={this.props.showModal && !this.state.runInOfflineMode}

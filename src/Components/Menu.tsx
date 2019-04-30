@@ -25,6 +25,7 @@ export default class AppMenu extends React.Component<ScreenProps, object> {
       )
     }
   }
+
   public render() {
     return (
       <div style={this.props.style}>

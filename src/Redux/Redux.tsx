@@ -122,9 +122,13 @@ export function reducer(state: AppState = initialState, action: AppActions): App
 
       const updated = (new Date).getTime()
       const json = value.toJSON() as ValueJSON
-      const texts = value.document.getBlocks().find((block?: Block) => block && block.text !== '' ? true : false)
-      const text = texts && texts.text !== '' ? texts.text : 'Note from ' + moment().format('ddd, h:mm a')
+      // const texts = value.document.getBlocks().find((block?: Block) => block && block.text !== '' ? true : false)
+      // const text = texts && texts.text !== '' ? texts.text : 'Note from ' + moment().format('ddd, h:mm a')
       
+      const text = value.document.getBlocks().map((block?: Block) => {
+        if (!block) return '\n'
+        return `${block.text}\n`
+      }).join()
       if (state.activeNote) {
         const refBlock = state.activeNote.block ? state.activeNote.block : state.activeNote.refBlock
         return {...state, activeNote: {

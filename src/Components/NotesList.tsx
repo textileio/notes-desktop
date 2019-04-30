@@ -30,10 +30,12 @@ class NotesList extends React.Component<ScreenProps> {
       color: 'rgba(255, 255, 255, 0.2)'
     }
     const timestamp = moment(note.updated).fromNow()
+    const lines = note.text.split('\n')
+    const target = lines.length ? lines[0] : ''
     return (
       <div className={'text'} onClick={() => {this.props.selectNote(note)}} style={noteStyle} key={note.key}>
         <div style={timeStamp}>{timestamp}</div>
-        {note.text}
+        {target}
       </div>
     )
   }

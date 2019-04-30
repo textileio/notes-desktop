@@ -1,8 +1,7 @@
 import { call, put, delay, takeLatest, all, fork, select, take, race } from 'redux-saga/effects'
 import AppActions, { AppSelectors, Note } from './Redux'
 import { ActionType } from 'typesafe-actions'
-import Textile, { ApiOptions, ThreadList, Thread, FileIndex, FilesList, File, ThreadFiles } from '@textile/js-http-client'
-import Files from '@textile/js-http-client/dist/modules/files';
+import Textile, { ApiOptions, ThreadList, Thread, FileIndex, FilesList } from '@textile/js-http-client'
 
 const notesAppKey = 'io.textile.notes_desktop_primary_v1'
 
@@ -130,7 +129,6 @@ function * createOrUpdateThreadSaga() {
     const threads: ThreadList = yield call([textile.threads, 'list'])
     const appThread = threads.items.filter((thread: Thread) => thread.key === notesAppKey)
     if (appThread.length) {
-      console.log(appThread[0].key)
       // store app thread
       console.info('INFO -- existing app thread found')
       yield put(AppActions.setThreadId(appThread[0].id))
