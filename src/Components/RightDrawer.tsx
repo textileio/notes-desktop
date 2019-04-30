@@ -16,7 +16,7 @@ const buttonStyle = {background: '#2935ff', padding: 5, color: 'white', marginRi
 
 interface ScreenProps {
   isOpen: boolean
-  name: string
+  name?: string
   width: string | undefined
   style: React.CSSProperties
   showQRCodeLink: boolean

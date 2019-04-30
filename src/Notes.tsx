@@ -221,7 +221,7 @@ class NotesApp extends React.Component<Props> {
         <div>
           <RightDrawer
             isOpen={this.state.isDrawerOpen}
-            name={'display'}
+            name={this.props.name}
             width={menuWidth}
             style={menuStyle}
             onClose={() => {
