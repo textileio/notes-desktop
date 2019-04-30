@@ -233,6 +233,7 @@ class NotesApp extends React.Component<Props> {
         </div> 
         
         <QRCodeInvite
+          visible={!this.props.showSyncIssue}
           onDismiss={() => { this.setState({displayQRCode: false}) }}
           isOpen={this.state.displayQRCode}
           style={modalStyle}
