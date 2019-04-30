@@ -1,7 +1,9 @@
 // action types
 import { createAction, ActionType, getType } from 'typesafe-actions'
 import { RootState } from './Types'
-import { Value } from 'slate';
+import { Value, ValueJSON, Block } from 'slate'
+import { Md5 } from 'ts-md5/dist/md5'
+import moment = require('moment')
 
 const actions = {
   logout: createAction('app/LOGOUT'),
@@ -16,23 +18,22 @@ const actions = {
   setThreadId: createAction('app/SetThreadId', (resolve) => {
     return (threadId: string) => resolve({threadId})
   }),
+  updateActiveNote: createAction('app/UpdateActiveNote', (resolve) => {
+    return (value: Value) => resolve({value})
+  }),
   addOrUpdate: createAction('app/AddOrUpdate', (resolve) => {
     return (note: Note) => resolve({note})
   }),
   linkBlockToNote: createAction('app/LinkBlockToNote', (resolve) => {
-    return (note: Note, block: string) => resolve({note, block})
+    return (key: string, block: string) => resolve({key, block})
   }),
   selectNote: createAction('app/SelectNote', (resolve) => {
     return (note: Note) => resolve({note})
   }),
-  updateActiveNote: createAction('app/UpdateActiveNote', (resolve) => {
-    return (value: Value) => resolve({value})
-  }),
-  saveNote: createAction('app/SaveNote', (resolve) => {
-    return (note: string, select?: boolean) => resolve({note, select})
-  }),
+  saveNote: createAction('app/SaveNote'),
+  saveNoteSuccess: createAction('app/SaveNoteSuccess'),
   setNotes: createAction('app/setNotes', (resolve) => {
-    return (notes: Note[], activeNote?: Note) => resolve({notes, activeNote})
+    return (notes: Note[]) => resolve({notes})
   }),
   clearNote: createAction('app/ClearNote'),
   deleteNote: createAction('app/DeleteNote'),
@@ -49,10 +50,10 @@ const actions = {
 
 export type AppActions = ActionType<typeof actions>
 
-
 export interface Note {
   key: string
-  json: any
+  text: string
+  value: ValueJSON
   created: number
   updated: number
   block?: string
@@ -61,8 +62,8 @@ export interface Note {
 
 // ActiveNote is different since we want to hang onto a UI ready value + an old block ID we should delete if we save
 export interface ActiveNote extends Note {
-  value: Value
   refBlock?: string
+  saved?: boolean
 }
 
 export interface AppState {
@@ -109,22 +110,42 @@ export function reducer(state: AppState = initialState, action: AppActions): App
     case getType(actions.setThreadId): {
       return {...state, appThreadId: action.payload.threadId}
     }
+    case getType(actions.saveNoteSuccess): {
+      if (!state.activeNote) {
+        return state
+      }
+      return {...state, activeNote: {...state.activeNote, saved: true}}
+    }
     case getType(actions.updateActiveNote): {
+      // Simply update our ActiveNote without any sync to Textile
       const { value } = action.payload
-      const updated = (new Date).getTime()
-      const activeNote = state.activeNote || {
-        key: String(updated) + String(value.hashCode()),
-        value,
-        updated,
-        created: updated,
-        json: {}
-      }
-      if (activeNote) {
-        activeNote.value = value
-        activeNote.updated = updated
-      } else {
 
+      const updated = (new Date).getTime()
+      const json = value.toJSON() as ValueJSON
+      const texts = value.document.getBlocks().find((block?: Block) => block && block.text !== '' ? true : false)
+      const text = texts && texts.text !== '' ? texts.text : 'Note from ' + moment().format('ddd, h:mm a')
+      
+      if (state.activeNote) {
+        const refBlock = state.activeNote.block ? state.activeNote.block : state.activeNote.refBlock
+        return {...state, activeNote: {
+          ...state.activeNote,
+          value: json,
+          saved: false,
+          block: undefined,
+          text,
+          updated,
+          refBlock
+        }}
       }
+
+      const key = Md5.hashStr(JSON.stringify(json)).toString()
+      return {...state, activeNote: {
+        value: json,
+        key: key + String(updated),
+        created: updated,
+        updated,
+        text,
+      }}
     }
     case getType(actions.addOrUpdate): {
       const { note } = action.payload
@@ -150,17 +171,17 @@ export function reducer(state: AppState = initialState, action: AppActions): App
       return {...state, notes, activeNote}
     }
     case getType(actions.linkBlockToNote): {
-      const { note, block } = action.payload
+      const { key, block } = action.payload
       const updatedNotes = state.notes.map((existing) => {
-        if (note.key === existing.key) {
-          return {...note, block}
+        if (key === existing.key) {
+          return {...existing, block}
         }
         return existing
       })
       return {
         ...state,
         notes: updatedNotes,
-        activeNote: state.activeNote && state.activeNote.key === note.key ? {...note, block} : state.activeNote
+        activeNote: state.activeNote && state.activeNote.key === key ? {...state.activeNote, block} : state.activeNote
       }
     }
     case getType(actions.setDisplayName): {
@@ -172,13 +193,12 @@ export function reducer(state: AppState = initialState, action: AppActions): App
     }
     case getType(actions.selectNote): {
       const { note } = action.payload
-      return {...state, activeNote: note}
+      return {...state, activeNote: {...note, refBlock: note.block, saved: true}}
     }
     case getType(actions.setNotes): {
       return {
         ...state,
-        notes: action.payload.notes,
-        activeNote: action.payload.activeNote
+        notes: action.payload.notes
       }
     }
     case getType(actions.deleteNoteSuccess): {

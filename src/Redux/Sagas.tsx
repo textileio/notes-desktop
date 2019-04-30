@@ -4,7 +4,7 @@ import { ActionType } from 'typesafe-actions'
 import Textile, { ApiOptions, ThreadList, Thread, FileIndex, FilesList, File, ThreadFiles } from '@textile/js-http-client'
 import Files from '@textile/js-http-client/dist/modules/files';
 
-const notesAppKey = 'io.textile.notes_desktop_primary_v0'
+const notesAppKey = 'io.textile.notes_desktop_primary_v1'
 
 const notesSchema = {
   "name": "note",
@@ -15,23 +15,27 @@ const notesSchema = {
     "$id": "http://example.com/root.json",
     "type": "object",
     "title": "",
-    "required": ["text", "key", "created", "updated"],
+    "required": ["key", "text", "value", "updated", "created"],
     "properties": {
-      "text": {
-        "type": "string",
-      },
       "key": {
         "type": "string",
       },
-      "created": {
-        "type": "integer",
+      "text": {
+        "type": "string",
+      },
+      "value": {
+        "type": "object",
       },
       "updated": {
+        "type": "integer",
+      },
+      "created": {
         "type": "integer",
       }
     }
   }
 }
+
 
 const options: ApiOptions = {
   url: '127.0.0.1',
@@ -100,6 +104,9 @@ function* deleteNoteSaga(action: ActionType<typeof AppActions.deleteNote>) {
   if (activeNote && activeNote.block) {
     yield call(removeBlock, activeNote.block)
   }
+  if (activeNote && activeNote.refBlock) {
+    yield call(removeBlock, activeNote.refBlock)
+  }
   yield put(AppActions.deleteNoteSuccess())
 }
 
@@ -107,50 +114,15 @@ function* deleteNoteSaga(action: ActionType<typeof AppActions.deleteNote>) {
 function* saveNoteSaga(action: ActionType<typeof AppActions.saveNote>) {
   const notes: Note[] = yield select(AppSelectors.notes)
   const activeNote = yield select(AppSelectors.activeNote)
+  
+  const updatedNotes = [...notes.filter((note) => note.key !== activeNote.key), activeNote]
+  yield put(AppActions.setNotes(updatedNotes))
 
-  const updated = (new Date).getTime()
-
-  // Update our existing note
-  if (activeNote) {
-    const updatedNote = {
-      ...activeNote,
-      text: action.payload.note,
-      updated,
-      block: undefined
-    }
-
-    const updatedNotes = [...notes.filter((note) => note.key !== updatedNote.key), updatedNote]
-
-    // Keep the note selected by updating activeNote
-    if (action.payload.select) {
-      yield put(AppActions.setNotes(updatedNotes, updatedNote))
-    } else {
-      yield put(AppActions.setNotes(updatedNotes, undefined))
-    }
-    yield call(addNoteToThread, updatedNote)
-
-    // Remove our old record
-    if (activeNote.block) {
-      yield call(removeBlock, activeNote.block)
-    }
-  } else {
-    // Add the new note
-    const created = updated
-    const newNote = {
-      key: action.payload.note + String(created),
-      text: action.payload.note,
-      created,
-      updated
-    }
-    const updatedNotes = [...notes, newNote]
-    // if it should be selected, make it the activeNote
-    if (action.payload.select) {
-      yield put(AppActions.setNotes(updatedNotes, newNote))
-    } else {
-      yield put(AppActions.setNotes(updatedNotes, undefined))
-    }
-    yield call(addNoteToThread, newNote)
-  }
+  if (activeNote.refBlock) {
+    yield call(removeBlock, activeNote.refBlock)
+  } 
+  yield call(addNoteToThread, activeNote)
+  yield put(AppActions.saveNoteSuccess())
 }
 
 function * createOrUpdateThreadSaga() {
@@ -158,6 +130,7 @@ function * createOrUpdateThreadSaga() {
     const threads: ThreadList = yield call([textile.threads, 'list'])
     const appThread = threads.items.filter((thread: Thread) => thread.key === notesAppKey)
     if (appThread.length) {
+      console.log(appThread[0].key)
       // store app thread
       console.info('INFO -- existing app thread found')
       yield put(AppActions.setThreadId(appThread[0].id))
@@ -222,16 +195,18 @@ function * addNoteToThread(note: Note) {
 
   const appThreadId = yield select(AppSelectors.appThreadId)
 
+  // TODO: Fix
   const payload = {
-    "text": note.text,
-    "key": note.key,
-    "created": note.created,
-    "updated": note.updated
+    key: note.key,
+    text: note.text,
+    created: note.created,
+    updated: note.updated,
+    value: note.value
   }
   try {
     const result = yield call([textile.files, 'addFile'], JSON.stringify(payload), '', appThreadId)
-    // Link our redux stored note with the block in our thread (will match later reads directly from thread)
-    yield put(AppActions.linkBlockToNote(note, result.block))    
+    // // Link our redux stored note with the block in our thread (will match later reads directly from thread)
+    yield put(AppActions.linkBlockToNote(note.key, result.block))
   } catch (error) {
     yield call(markUnsynced)
   }

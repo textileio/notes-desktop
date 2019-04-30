@@ -1,6 +1,6 @@
 import React from 'react'
-import { Editor, EditorProps, RenderMarkProps, RenderNodeProps } from 'slate-react'
-import { Value } from 'slate'
+import { Editor, EditorProps, RenderMarkProps, RenderNodeProps, EventHook } from 'slate-react'
+import { Value, Node } from 'slate'
 import EditorMenu from './EditorMenu'
 
 interface TextAreaProps {
@@ -17,13 +17,6 @@ class NoteArea extends React.Component<TextAreaProps> {
    */
 
   menu?: HTMLDivElement | null
-
-  // state = {
-  //   value: initialValue
-  // }
-  /**
-   * On update, update the menu.
-   */
 
   componentDidMount = () => {
     this.updateMenu()
@@ -62,17 +55,12 @@ class NoteArea extends React.Component<TextAreaProps> {
       rect.width / 2}px`
   }
 
-  /**
-   * Render.
-   *
-   * @return {Element}
-   */
-
    //@ts-ignore
   onChange = ({ value }) => {
     // this.setState({ value })
     this.props.onChange( value )
   }
+
   render() {
     return (
       <div>
@@ -85,6 +73,10 @@ class NoteArea extends React.Component<TextAreaProps> {
           renderEditor={this.renderEditor}
           renderMark={this.renderMark}
           style={this.props.style}
+          className={'text'}
+          plugins={[
+            AutoExitBlock()
+          ]}
         />
       </div>
     )
@@ -146,6 +138,45 @@ class NoteArea extends React.Component<TextAreaProps> {
         return <u {...attributes}>{children}</u>
       default:
         return next()
+    }
+  }
+}
+
+function AutoExitBlock() {
+  return {
+    //@ts-ignore
+    onKeyDown(event, change, next) {
+
+      const options = {
+        blockType: /^(heading-one|heading-two)$/,
+        exitBlockType: 'paragraph',
+        onEmptyBlock: false,
+        unwrap: false
+      }
+
+      if (event.key !== 'Enter' && !event.shiftKey) {
+        return next()
+      }
+
+      let block = change.value.startBlock
+      let blockType = block.type
+      let isBlockEmpty = block.isEmpty
+
+      let regexp = RegExp(options.blockType)
+      if (regexp.test(blockType) || options.blockType === blockType) {
+        if (options.onEmptyBlock) {
+          if (isBlockEmpty)
+            if (options.unwrap) {
+              let parentType = change.value.document.getParent(block.key).type
+              return change.setBlocks(options.exitBlockType).unwrapBlock(parentType)
+            } else
+              return change.setBlocks(options.exitBlockType)
+          else
+            return
+        } else
+          return change.insertBlock(options.exitBlockType)
+      }
+      return next()
     }
   }
 }

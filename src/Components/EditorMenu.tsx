@@ -98,20 +98,6 @@ class EditorMenu extends React.Component<EditorMenuProps> {
 
    // Handle everything but list buttons.
    if (type !== 'bulleted-list' && type !== 'numbered-list') {
-     console.log(type)
-    //  if (type === 'heading') {
-    //     const header1Type = 'heading-one'
-    //     const header1 = this.hasBlock(header1Type)
-    //     const header2Type = 'heading-two'
-    //     const header2 = this.hasBlock(header2Type)
-    //     if (header2) {
-    //       editor.setBlocks(header1Type)
-    //     } else if (header1) {
-    //       editor.setBlocks('paragraph')
-    //     } else {
-    //       editor.setBlocks(header2Type)
-    //     }
-    //  }
      const isActive = this.hasBlock(type)
      editor.setBlocks(isActive ? 'paragraph' : type)
    } else {
@@ -166,7 +152,6 @@ class EditorMenu extends React.Component<EditorMenuProps> {
    const { innerRef } = this.props
    const main = window.document.getElementById('main')
    if (!main) return
-   console.log('Render menu')
    return ReactDOM.createPortal(
      <StyledMenu ref={innerRef}>
        {this.renderBlockButton('heading-one', 'format_heading_one')}

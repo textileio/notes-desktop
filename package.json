@@ -29,8 +29,11 @@
     "redux-persist": "^5.10.0",
     "redux-saga": "^1.0.2",
     "slate": "^0.45.1",
+    "slate-auto-exit-block": "^1.1.0",
     "slate-react": "^0.21.21",
-    "typesafe-actions": "^4.1.2"
+    "ts-md5": "^1.2.4",
+    "typesafe-actions": "^4.1.2",
+    "xxhash": "^0.2.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",
