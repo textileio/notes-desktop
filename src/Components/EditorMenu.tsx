@@ -51,32 +51,32 @@ class EditorMenu extends React.Component<EditorMenuProps> {
      color: 'black',
      zIndex: 10001
    }
-   switch(icon) {
-     case 'format_heading_one': 
+   switch (icon) {
+     case 'format_heading_one':
        return (
          <Icons.FormatSize style={iconStyle} onMouseDown={onMouseDown}/>
        )
-      case 'format_heading_two': 
+      case 'format_heading_two':
         return (
           <Icons.FormatSize style={{...iconStyle, fontSize: 14, lineHeight: 20}} onMouseDown={onMouseDown}/>
         )
-     case 'format_bold': 
+     case 'format_bold':
        return (
          <Icons.FormatBold style={iconStyle} onMouseDown={onMouseDown}/>
        )
-     case 'format_italic': 
+     case 'format_italic':
        return (
          <Icons.FormatItalic style={iconStyle}  onMouseDown={onMouseDown}/>
        )
-     case 'format_underlined': 
+     case 'format_underlined':
        return (
          <Icons.FormatUnderlined style={iconStyle} onMouseDown={onMouseDown} />
        )
-     case 'code': 
+     case 'code':
        return (
          <Icons.Code style={iconStyle} onMouseDown={onMouseDown} />
        )
-     case 'format_list_numbered': 
+     case 'format_list_numbered':
        return (
          <Icons.FormatListNumbered style={iconStyle} onMouseDown={onMouseDown} />
        )
@@ -144,14 +144,14 @@ class EditorMenu extends React.Component<EditorMenuProps> {
        isActive = this.hasBlock('list-item') && parent && parent.type === type
      }
    }
-   
+
    return this.getIcon(icon, isActive, (event) => { this.onClickBlock(event, type) })
  }
 
  render() {
    const { innerRef } = this.props
    const main = window.document.getElementById('main')
-   if (!main) return
+   if (!main) { return }
    return ReactDOM.createPortal(
      <StyledMenu ref={innerRef}>
        {this.renderBlockButton('heading-one', 'format_heading_one')}

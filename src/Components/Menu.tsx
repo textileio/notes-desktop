@@ -2,7 +2,6 @@ import * as React from 'react'
 import Tooltip from '@material-ui/core/Tooltip'
 import * as Icons from '@material-ui/icons'
 
-
 interface ScreenProps {
   style: React.CSSProperties
   buttonStyle: React.CSSProperties

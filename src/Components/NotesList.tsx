@@ -42,7 +42,7 @@ class NotesList extends React.Component<ScreenProps> {
   render(): React.ReactNode {
     const notesList = this.props.notes
       .sort((a: Note, b: Note) => a.updated < b.updated ? 1 : -1)
-      .map((note: Note, index: number) => { return this.renderNote(note, index) })
+      .map((note: Note, index: number) => this.renderNote(note, index))
     return (
       <div style={this.props.style}>
         {notesList}

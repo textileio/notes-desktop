@@ -32,7 +32,7 @@ class NoteArea extends React.Component<TextAreaProps> {
 
   updateMenu = () => {
     const menu = this.menu
-    if (!menu) return
+    if (!menu) { return }
 
     const { value } = this.props
     const { fragment, selection } = value
@@ -47,7 +47,7 @@ class NoteArea extends React.Component<TextAreaProps> {
     const range = native && native.getRangeAt(0)
     const rect = range ? range.getBoundingClientRect() : {top: 10, left: 10, width: 100}
     menu.style.opacity = '1'
-    menu.style.top = `${rect.top - 60}px` //`${rect.top + window.pageYOffset - 100}px`
+    menu.style.top = `${rect.top - 60}px` // `${rect.top + window.pageYOffset - 100}px`
     menu.style.height = `46px`
     menu.style.left = `${rect.left +
       window.pageXOffset -
@@ -55,10 +55,9 @@ class NoteArea extends React.Component<TextAreaProps> {
       rect.width / 2}px`
   }
 
-   //@ts-ignore
-  onChange = ({ value }) => {
-    // this.setState({ value })
-    this.props.onChange( value )
+   // @ts-ignore
+  onChange = (event: { operations: Immutable.List<Operation>, value: Value }) => {
+    this.props.onChange(event.value)
   }
 
   render() {
@@ -66,7 +65,7 @@ class NoteArea extends React.Component<TextAreaProps> {
       <div>
         <Editor
           autoFocus={true}
-          placeholder="Enter some text..."
+          placeholder={'Enter some text...'}
           value={this.props.value}
           onChange={this.onChange}
           renderNode={this.renderNode}
@@ -74,14 +73,11 @@ class NoteArea extends React.Component<TextAreaProps> {
           renderMark={this.renderMark}
           style={this.props.style}
           className={'text'}
-          plugins={[
-            AutoExitBlock()
-          ]}
+          plugins={Plugins}
         />
       </div>
     )
   }
-
 
   renderNode = (props: RenderNodeProps, editor: any, next: () => any) => {
     const { attributes, children, node } = props
@@ -142,9 +138,13 @@ class NoteArea extends React.Component<TextAreaProps> {
   }
 }
 
+const Plugins = [
+  AutoExitBlock()
+]
+
 function AutoExitBlock() {
   return {
-    //@ts-ignore
+    // @ts-ignore
     onKeyDown(event, change, next) {
 
       const options = {
@@ -158,23 +158,26 @@ function AutoExitBlock() {
         return next()
       }
 
-      let block = change.value.startBlock
-      let blockType = block.type
-      let isBlockEmpty = block.isEmpty
+      const block = change.value.startBlock
+      const blockType = block.type
+      const isBlockEmpty = block.isEmpty
 
-      let regexp = RegExp(options.blockType)
-      if (regexp.test(blockType) || options.blockType === blockType) {
+      const regexp = RegExp(options.blockType)
+      if (regexp.test(blockType) && options.blockType === blockType) {
         if (options.onEmptyBlock) {
-          if (isBlockEmpty)
+          if (isBlockEmpty) {
             if (options.unwrap) {
-              let parentType = change.value.document.getParent(block.key).type
+              const parentType = change.value.document.getParent(block.key).type
               return change.setBlocks(options.exitBlockType).unwrapBlock(parentType)
-            } else
+            } else {
               return change.setBlocks(options.exitBlockType)
-          else
+            }
+          } else {
             return
-        } else
+          }
+        } else {
           return change.insertBlock(options.exitBlockType)
+        }
       }
       return next()
     }

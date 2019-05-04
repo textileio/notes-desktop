@@ -4,12 +4,11 @@ import Modal from 'react-modal'
 
 import { AppState } from '../Redux/Redux'
 import { RootState } from '../Redux/Types'
-import Textile from '@textile/js-http-client'
+import textile from '@textile/js-http-client'
 
-//@ts-ignore
+// @ts-ignore
 import QRCode from 'qrcode.react'
 import './Styles/Styles.css'
-
 
 interface ScreenProps {
   isOpen: boolean
@@ -22,18 +21,16 @@ class QRCodeInvite extends React.Component<Props> {
   state = {
     seed: undefined
   }
-  componentDidMount = () => {
-    try {
-      const options = {
-        url: '127.0.0.1',
-        port: 40602
+
+  componentDidUpdate = (next: Props) => {
+    if (!this.props.isOpen && next.isOpen && !this.state.seed) {
+      try {
+        textile.account.seed().then((seed) => {
+          this.setState({seed})
+        })
+      } catch (error) {
+        console.info('ERROR - ', error)
       }
-      const textile = new Textile(options)
-      textile.account.seed().then((seed) => {
-        this.setState({seed: seed})
-      })
-    } catch (error) {
-      console.info('ERROR - ', error)
     }
   }
 
@@ -46,7 +43,7 @@ class QRCodeInvite extends React.Component<Props> {
       <QRCode style={{alignSelf: 'center'}} value='url' />
     )
   }
-  render () {
+  render() {
     const el = document.getElementById('main') || {}
     return (
       <Modal
@@ -57,7 +54,10 @@ class QRCodeInvite extends React.Component<Props> {
       >
         <div style={{flex: 1, flexDirection: 'column', maxWidth: 300, alignContent: 'center', justifyContent: 'center'}}>
           <div className={'text'} style={{overflow: 'wrap', textAlign: 'center'}}>
-            Install <a href="https://medium.com/textileio/textile-notes-a-minimalist-tool-for-your-creative-ideas-68b9357d5cd0" target="_blank" >Textile Notes</a> on your mobile phone. After successfully installing and onboarding, point your phone's native camera at the QR code below.
+            Install <a href='https://medium.com/textileio/textile-notes-a-minimalist-tool-for-your-creative-ideas-68b9357d5cd0' target='_blank' >
+            Textile Notes
+            </a>
+            on your mobile phone. After successfully installing and onboarding, point your phone's native camera at the QR code below.
           </div>
           <div style={{padding: 20, display: 'flex', flex: 1, flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
             {this.renderQR()}
@@ -80,6 +80,5 @@ const mapStateToProps = (state: RootState): UIProps => {
     inviteURL: 'https://textile.io/'
   }
 }
-
 
 export default connect(mapStateToProps, undefined)(QRCodeInvite)

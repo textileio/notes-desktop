@@ -68,7 +68,7 @@ export interface ActiveNote extends Note {
 
 export interface AppState {
     connection: 'starting' | 'success' | 'failure'
-    sessions: number 
+    sessions: number
     notes: ReadonlyArray<Note>
     pendingDeletes: ReadonlyArray<string>
     appThreadId?: string
@@ -120,15 +120,15 @@ export function reducer(state: AppState = initialState, action: AppActions): App
       // Simply update our ActiveNote without any sync to Textile
       const { value } = action.payload
 
-      const updated = (new Date).getTime()
+      const updated = (new Date()).getTime()
       const json = value.toJSON() as ValueJSON
       // const texts = value.document.getBlocks().find((block?: Block) => block && block.text !== '' ? true : false)
       // const text = texts && texts.text !== '' ? texts.text : 'Note from ' + moment().format('ddd, h:mm a')
-      
       const text = value.document.getBlocks().map((block?: Block) => {
-        if (!block) return '\n'
+        if (!block) { return '\n' }
         return `${block.text}\n`
       }).join()
+
       if (state.activeNote) {
         const refBlock = state.activeNote.block ? state.activeNote.block : state.activeNote.refBlock
         return {...state, activeNote: {
@@ -148,25 +148,17 @@ export function reducer(state: AppState = initialState, action: AppActions): App
         key: key + String(updated),
         created: updated,
         updated,
-        text,
+        text
       }}
     }
     case getType(actions.addOrUpdate): {
       const { note } = action.payload
       const exists = state.notes.find((n) => n.key === note.key)
-      var final = note
-      if (exists) {
-        // if your thread stored note is newer, base of it
-        if (note.updated > exists.updated) {
-          final = note
-        } else {
-          final = {...exists, block: note.block}
-        }
-      }
+      const final = !exists || note.updated > exists.updated ? note : {...exists, block: note.block}
 
       const notes = state.notes.filter((n) => n.key !== final.key)
       notes.push(final)
-      
+
       const activeNote = state.activeNote
       if (activeNote && activeNote.key === final.key) {
         activeNote.block = final.block

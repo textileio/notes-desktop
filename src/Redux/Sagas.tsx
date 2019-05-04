@@ -1,46 +1,39 @@
 import { call, put, delay, takeLatest, all, fork, select, take, race } from 'redux-saga/effects'
 import AppActions, { AppSelectors, Note } from './Redux'
 import { ActionType } from 'typesafe-actions'
-import Textile, { ApiOptions, ThreadList, Thread, FileIndex, FilesList } from '@textile/js-http-client'
+import textile, { ThreadList, Thread, FileIndex, FilesList } from '@textile/js-http-client'
 
 const notesAppKey = 'io.textile.notes_desktop_primary_v1'
 
 const notesSchema = {
-  "name": "note",
-  "mill": "/json",
-  "json_schema": {
-    "definitions": {},
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "http://example.com/root.json",
-    "type": "object",
-    "title": "",
-    "required": ["key", "text", "value", "updated", "created"],
-    "properties": {
-      "key": {
-        "type": "string",
+  name: 'io.textile.notes_primary_v0.0.1',
+  mill: '/json',
+  json_schema: {
+    definitions: {},
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    $id: 'http://example.com/root.json',
+    type: 'object',
+    title: '',
+    required: ['key', 'text', 'value', 'updated', 'created'],
+    properties: {
+      key: {
+        type: 'string'
       },
-      "text": {
-        "type": "string",
+      text: {
+        type: 'string'
       },
-      "value": {
-        "type": "object",
+      value: {
+        type: 'object'
       },
-      "updated": {
-        "type": "integer",
+      updated: {
+        type: 'integer'
       },
-      "created": {
-        "type": "integer",
+      created: {
+        type: 'integer'
       }
     }
   }
 }
-
-
-const options: ApiOptions = {
-  url: '127.0.0.1',
-  port: 40602
-}
-const textile = new Textile(options)
 
 const rootSaga = function* root() {
   yield all([
@@ -52,7 +45,6 @@ const rootSaga = function* root() {
     fork(connectionPolling)
   ])
 }
-
 
 function* initTextile() {
   yield takeLatest('app/Startup', initTextileSaga)
@@ -78,11 +70,10 @@ function * initTextileSaga() {
     const address = yield call([textile.account, 'address'])
     console.info('INFO - Textile connection success')
     console.info(`INFO - ${address}`)
-    yield put(AppActions.startupSuccess())
     yield put(AppActions.getDisplayName())
     yield put(AppActions.createOrUpdateThread())
   } catch (error) {
-    console.info('INFO - Textile connection failure')
+    console.error('ERROR -- Textile connection failure')
     yield put(AppActions.connectionFailure())
   }
 }
@@ -92,7 +83,8 @@ function * getDislpayNameSaga() {
   try {
     const name = yield call([textile.profile, 'name'])
     yield put(AppActions.setDisplayName(name))
-  } catch(error) {
+  } catch (error) {
+    console.error('ERROR --', error)
     yield put(AppActions.connectionFailure())
   }
 }
@@ -113,13 +105,13 @@ function* deleteNoteSaga(action: ActionType<typeof AppActions.deleteNote>) {
 function* saveNoteSaga(action: ActionType<typeof AppActions.saveNote>) {
   const notes: Note[] = yield select(AppSelectors.notes)
   const activeNote = yield select(AppSelectors.activeNote)
-  
+
   const updatedNotes = [...notes.filter((note) => note.key !== activeNote.key), activeNote]
   yield put(AppActions.setNotes(updatedNotes))
 
   if (activeNote.refBlock) {
     yield call(removeBlock, activeNote.refBlock)
-  } 
+  }
   yield call(addNoteToThread, activeNote)
   yield put(AppActions.saveNoteSuccess())
 }
@@ -139,9 +131,10 @@ function * createOrUpdateThreadSaga() {
       const newThread = yield call([textile.threads, 'add'], 'textile-pages-desktop', newSchema.hash, notesAppKey)
       yield put(AppActions.setThreadId(newThread.id))
       yield call(refreshStoredNotes, newThread.id)
+      yield put(AppActions.startupSuccess())
     }
-  } catch(error) {
-    console.log(error)
+  } catch (error) {
+    console.error('ERROR --', error)
     yield put(AppActions.connectionFailure())
   }
 }
@@ -149,8 +142,9 @@ function * createOrUpdateThreadSaga() {
 // Mark - Async methods to help Sagas
 
 // Notifies that the Redux notes or removals are unsynced to the thread
-function * markUnsynced() {
+function * markUnsynced(type: string, error: Error) {
   // Assume it's because of a connection failure for now
+  console.error(type, error.message)
   yield put(AppActions.connectionFailure())
   yield put(AppActions.markOutOfDate())
 }
@@ -183,7 +177,7 @@ function * removeBlock(block: string) {
   try {
     yield call([textile.blocks, 'remove'], block)
   } catch (error) {
-    yield call(markUnsynced)
+    yield call(markUnsynced, 'removing block', error)
     yield put(AppActions.deleteNoteFailure(block))
   }
 }
@@ -202,18 +196,18 @@ function * addNoteToThread(note: Note) {
     value: note.value
   }
   try {
-    const result = yield call([textile.files, 'addFile'], JSON.stringify(payload), '', appThreadId)
+    const result = yield call([textile.files, 'add'], JSON.stringify(payload), '', appThreadId)
     // // Link our redux stored note with the block in our thread (will match later reads directly from thread)
     yield put(AppActions.linkBlockToNote(note.key, result.block))
   } catch (error) {
-    yield call(markUnsynced)
+    yield call(markUnsynced, 'finalizing save', error)
   }
 }
 
 // Gets raw note data from Thread
 function * fetchNoteFromFile(entry: any) {
   const { block, files } = entry
-  const fileData = yield call([textile.files, 'fileData'], files[0].file.hash)
+  const fileData = yield call([textile.file, 'content'], files[0].file.hash)
   const note = JSON.parse(fileData)
   return {...note, block}
 }
@@ -274,4 +268,4 @@ function* connectionPolling() {
   }
 }
 
-export default rootSaga;
+export default rootSaga

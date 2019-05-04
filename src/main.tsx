@@ -25,7 +25,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer)
 const sagaMiddleware = createSagaMiddleware()
 
 interface Window {
-  [key:string]: any; // Add index signature
+  [key: string]: any // Add index signature
 }
 const w = window as Window
 const reduxDevTools: any = w['__REDUX_DEVTOOLS_EXTENSION__'] && w['__REDUX_DEVTOOLS_EXTENSION__']()
