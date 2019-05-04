@@ -72,6 +72,7 @@ function * initTextileSaga() {
     console.info(`INFO - ${address}`)
     yield put(AppActions.getDisplayName())
     yield put(AppActions.createOrUpdateThread())
+    yield put(AppActions.startupSuccess())
   } catch (error) {
     console.error('ERROR -- Textile connection failure')
     yield put(AppActions.connectionFailure())
@@ -131,7 +132,6 @@ function * createOrUpdateThreadSaga() {
       const newThread = yield call([textile.threads, 'add'], 'textile-pages-desktop', newSchema.hash, notesAppKey)
       yield put(AppActions.setThreadId(newThread.id))
       yield call(refreshStoredNotes, newThread.id)
-      yield put(AppActions.startupSuccess())
     }
   } catch (error) {
     console.error('ERROR --', error)
