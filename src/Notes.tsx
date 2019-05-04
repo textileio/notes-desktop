@@ -8,8 +8,6 @@ import { RootState, RootAction } from './Redux/Types'
 
 import Tooltip from '@material-ui/core/Tooltip'
 import * as Icons from '@material-ui/icons'
-import Drawer from './Components/Drawer'
-import NotesList from './Components/NotesList'
 import NoteArea from './Components/NoteArea'
 import Menu from './Components/Menu'
 import QRCodeInvite from './Components/QRCodeInvite'

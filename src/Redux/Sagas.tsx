@@ -72,7 +72,16 @@ function * initTextileSaga() {
     console.info(`INFO - ${address}`)
     yield put(AppActions.getDisplayName())
     yield put(AppActions.createOrUpdateThread())
-    yield put(AppActions.startupSuccess())
+
+      // ensures that nothing else triggers an error
+    const { failure } = yield race({
+      failure: take('app/ConnectionFailure'),
+      timeout: delay(1500)
+    })
+    if (!failure) {
+      yield put(AppActions.startupSuccess())
+    }
+
   } catch (error) {
     console.error('ERROR -- Textile connection failure')
     yield put(AppActions.connectionFailure())
@@ -195,8 +204,8 @@ function * addNoteToThread(note: Note) {
     updated: note.updated,
     value: note.value
   }
+  const result = yield call([textile.files, 'add'], JSON.stringify(payload), '', appThreadId)
   try {
-    const result = yield call([textile.files, 'add'], JSON.stringify(payload), '', appThreadId)
     // // Link our redux stored note with the block in our thread (will match later reads directly from thread)
     yield put(AppActions.linkBlockToNote(note.key, result.block))
   } catch (error) {

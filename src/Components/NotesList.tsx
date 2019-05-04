@@ -1,5 +1,7 @@
 import * as React from 'react'
 import moment from 'moment'
+import Tooltip from '@material-ui/core/Tooltip'
+import * as Icons from '@material-ui/icons'
 import { Note } from '../Redux/Redux'
 import './Styles/Styles.css'
 
@@ -9,6 +11,7 @@ interface ScreenProps {
   style?: React.CSSProperties
 }
 class NotesList extends React.Component<ScreenProps> {
+
   renderNote = (note: Note, index: number) => {
     const noteStyle: React.CSSProperties = {
       padding: 0,
@@ -34,7 +37,9 @@ class NotesList extends React.Component<ScreenProps> {
     const target = lines.length ? lines[0] : ''
     return (
       <div className={'text'} onClick={() => {this.props.selectNote(note)}} style={noteStyle} key={note.key}>
-        <div style={timeStamp}>{timestamp}</div>
+        <div style={timeStamp}>
+          {timestamp}
+        </div>
         {target}
       </div>
     )

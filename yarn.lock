@@ -862,10 +862,10 @@
   resolved "https://registry.yarnpkg.com/@redux-saga/types/-/types-1.0.2.tgz#1d94f02800b094753f9271c206a26c2a06ca14ee"
   integrity sha512-8/qcMh15507AnXJ3lBeuhsdFwnWQqnp68EpUuHlYPixJ5vjVmls7/Jq48cnUlrZI8Jd9U1jkhfCl0gaT5KMgVw==
 
-"@textile/js-http-client@0.2.14":
-  version "0.2.14"
-  resolved "https://registry.yarnpkg.com/@textile/js-http-client/-/js-http-client-0.2.14.tgz#441ef839f3c1411d49d5362803585a03e542a2a1"
-  integrity sha512-NhpC2NyVqhoOsH5oiWBZM/VrRnkKW5q+WLzuNU0cEz03Zma5HJ4OBMZ9C9ocbI0+TrJxLmS+FTMSLH7iRcSr7g==
+"@textile/js-http-client@0.2.15":
+  version "0.2.15"
+  resolved "https://registry.yarnpkg.com/@textile/js-http-client/-/js-http-client-0.2.15.tgz#2791756e23ccf8a5069e059f7b479749b57b42cb"
+  integrity sha512-H31Hn/UhKuolWbsDTYB1cRNKnHkXYhkI8t/+cKDducKuHFSBxeQT/Vto8Zv9j8NCpZy4kUNmW2Y4U8kI0rOdYg==
   dependencies:
     bip39 "^2.5.0"
     bs58 "^4.0.1"

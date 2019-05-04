@@ -39,7 +39,7 @@ class RightDrawer extends React.Component<Props> {
     )
   }
   qrCodeLink = () => {
-    if (this.props.showQRCodeLink) {
+    if (!this.props.showQRCodeLink) {
       return (<div></div>)
     }
     return (
