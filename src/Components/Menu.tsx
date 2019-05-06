@@ -10,17 +10,22 @@ interface ScreenProps {
   deleteNote: () => void
   saveAndSelectNote: () => void
   requiresSave?: boolean
+  requiresSync?: boolean
   showSyncIssue?: boolean
 }
 export default class AppMenu extends React.Component<ScreenProps, object> {
   cloudUpdateIcon = () => {
-    if (!this.props.requiresSave) {
+    if (this.props.requiresSave && this.props.requiresSync) {
       return (
-        <Icons.CloudDone style={{...this.props.buttonStyle}} />
+        <Icons.CloudUpload onClick={this.props.saveAndSelectNote} style={{...this.props.buttonStyle, background: '#999'}} />
+      )
+    } else if (this.props.requiresSync) {
+      return (
+        <Icons.CloudDone style={{...this.props.buttonStyle, background: '#999'}} />
       )
     } else {
       return (
-        <Icons.CloudUpload onClick={this.props.saveAndSelectNote} style={{...this.props.buttonStyle, background: '#999'}} />
+        <Icons.CloudDone style={{...this.props.buttonStyle}} />
       )
     }
   }

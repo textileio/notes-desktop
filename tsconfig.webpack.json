@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["es6", "dom", "esnext"],
-    "jsx": "react",
+    "target": "es2018",
     "module": "commonjs",
+    "lib": ["dom", "es2018"],
+    "jsx": "react",
     "moduleResolution": "node",
     "declaration": true,
     "allowJs": false,
@@ -11,20 +11,9 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,
-    "outDir": "dist"
+    "outDir": "build",
   },
-  "include": [
-    "src"
-  ],
   "exclude": [
-    "scripts",
-    "node_modules",
-    "electron",
-    "examples",
-    "test",
-    "docs",
-    "public",
-    "dist"
-  ],
-  "compileOnSave": true
+    "node_modules"
+  ]
 }

@@ -10,16 +10,15 @@ import { PersistGate } from 'redux-persist/integration/react'
 import Notes from './Notes'
 
 // Only start the UI if in the browser
-// const userAgent = navigator.userAgent.toLowerCase()
-// if (userAgent.indexOf(' electron/') === -1) {
-  const {store, persistor} = configureStore(storage)
-   // Electron-specific code
+const userAgent = navigator.userAgent.toLowerCase()
+if (userAgent.indexOf(' electron/') === -1) {
+  const { store, persistor } = configureStore(storage)
   render(
     <Provider store={store}>
       <PersistGate loading={undefined} persistor={persistor}>
-        <Notes/>
+        <Notes />
       </PersistGate>
     </Provider>,
     document.getElementById('app')
   )
-// }
+}

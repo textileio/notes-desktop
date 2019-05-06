@@ -39,7 +39,7 @@ class RightDrawer extends React.Component<Props> {
     )
   }
   qrCodeLink = () => {
-    if (!this.props.showQRCodeLink) {
+    if (this.props.showQRCodeLink) {
       return (<div></div>)
     }
     return (
@@ -52,7 +52,7 @@ class RightDrawer extends React.Component<Props> {
   renderInnerDrawer = () => {
     const displayName = this.props.name && this.props.name !== '' ? this.props.name : 'Disconnected'
     return (
-      <div style={{display: 'flex', flex: 1, height: '100%', flexDirection: 'column'}}>
+      <div style={{display: 'flex', flex: 1, flexDirection: 'column', height: '100%', minHeight: '90vh'}}>
 
         <div style={{display: 'flex', paddingBottom: 10}}>
           <div className={'text'} style={{flex: 1, marginLeft: 20, color: '#9492de', textAlign: 'right'}}>{displayName}</div>
@@ -64,7 +64,7 @@ class RightDrawer extends React.Component<Props> {
           selectNote={this.props.selectNote}
         />
 
-        <div style={{display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', zIndex: 1000}}>
+        <div style={{display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', zIndex: 1000 }}>
           <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start'}}>
             {this.logoutLink()}
             {this.qrCodeLink()}

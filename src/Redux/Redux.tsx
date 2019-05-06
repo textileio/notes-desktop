@@ -29,6 +29,9 @@ const actions = {
   selectNote: createAction('app/SelectNote', (resolve) => {
     return (note: Note) => resolve({note})
   }),
+  fetchNewNote: createAction('app/FetchNewNote', (resolve) => {
+    return (blockId: string) => resolve({blockId})
+  }),
   saveNote: createAction('app/SaveNote'),
   saveNoteSuccess: createAction('app/SaveNoteSuccess'),
   setNotes: createAction('app/setNotes', (resolve) => {

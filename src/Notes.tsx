@@ -183,13 +183,11 @@ class NotesApp extends React.Component<Props> {
       color: '#2b2b2b'
     }
     return (
-      <div>
-        <NoteArea
-          value={this.state.currentNote}
-          onChange={this.updateCurrentNote}
-          style={textAreaStyle}
-        />
-      </div>
+      <NoteArea
+        value={this.state.currentNote}
+        onChange={this.updateCurrentNote}
+        style={textAreaStyle}
+      />
     )
   }
   public render(): React.ReactNode {
@@ -198,11 +196,12 @@ class NotesApp extends React.Component<Props> {
 
     return (
       <div style={{display: 'flex', flexDirection: 'column', padding: 0, margin: 0}}>
-        <div style={{display: 'flex', flexDirection: 'row', margin: 0, zIndex: 100}}>
+        <div style={{display: 'flex', flexDirection: 'row', margin: 0, zIndex: 1010}}>
           <Menu
             style={areaStyle}
             buttonStyle={buttonStyle}
             requiresSave={this.props.requiresSave}
+            requiresSync={this.props.requiresSync}
             saveAndSelectNote={this.saveAndSelectNote}
             toggleDrawer={this.toggleDrawer}
             clearNote={this.clearNote}
@@ -210,10 +209,9 @@ class NotesApp extends React.Component<Props> {
             showSyncIssue={this.props.showSyncIssue}
           />
         </div>
-        <div style={{display: 'flex', flex: 1, zIndex: 10, justifyContent: 'center', alignContent: 'center', overflow: 'scroll' }}>
+        <div style={{display: 'flex', flex: 1, justifyContent: 'center', alignContent: 'center', overflow: 'scroll' }}>
           {this.getNotePad()}
         </div>
-
         <div>
           <RightDrawer
             isOpen={this.state.isDrawerOpen}
@@ -225,11 +223,10 @@ class NotesApp extends React.Component<Props> {
             }}
             pairingRequest={this.displayQRCode}
             selectNote={this.selectNote}
-            showQRCodeLink={!this.props.showSyncIssue}
+            showQRCodeLink={!this.props.showQRCodeLink}
             logout={this.logout}
           />
         </div>
-
         <QRCodeInvite
           onDismiss={() => { this.setState({displayQRCode: false}) }}
           isOpen={this.state.displayQRCode}
@@ -267,10 +264,13 @@ interface UIProps extends AppState {
   showModal: boolean
   modalText: string
   requiresSave: boolean
+  requiresSync: boolean
+  showQRCodeLink: boolean
 }
 
 const mapStateToProps = (state: RootState): UIProps => {
   const showSyncIssue = state.app.connection === 'failure'
+  const showQRCodeLink = state.app.connection === 'success'
   let showModal = false
   let modalText = ''
   if (state.app.connection === 'failure' && state.app.sessions === 0) {
@@ -281,14 +281,16 @@ const mapStateToProps = (state: RootState): UIProps => {
                  Click ignore to run in offline mode.'
     showModal = true
   }
+  const requiresSync = state.app.activeNote && state.app.activeNote.block ? false : true
   const requiresSave = state.app.activeNote && !state.app.activeNote.saved || false
-  return { ...state.app, modalText, showModal, showSyncIssue, requiresSave}
+  return { ...state.app, modalText, showModal, showSyncIssue, requiresSave, requiresSync, showQRCodeLink}
 }
 
 interface ScreenDispatch {
   updateCurrentNote: (currentNote: Value) => void
   saveNote: () => void
   selectNote: (note: Note) => void
+  fetchNewNote: (blockId: string) => void
   clearNote: () => void
   deleteNote: () => void
   logout: () => void
@@ -297,6 +299,7 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>): ScreenDispatch => {
   return {
     updateCurrentNote: (currentNote: Value) => dispatch(AppActions.updateActiveNote(currentNote)),
     selectNote: (note: Note) => dispatch(AppActions.selectNote(note)),
+    fetchNewNote: (blockId: string) => dispatch(AppActions.fetchNewNote(blockId)),
     saveNote: () => dispatch(AppActions.saveNote()),
     clearNote: () => dispatch(AppActions.clearNote()),
     deleteNote: () => dispatch(AppActions.deleteNote()),
