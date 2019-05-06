@@ -150,7 +150,7 @@ class EditorMenu extends React.Component<EditorMenuProps> {
 
  render() {
    const { innerRef } = this.props
-   const main = window.document.getElementById('main')
+   const main = window.document.getElementById('app')
    if (!main) { return }
    return ReactDOM.createPortal(
      <StyledMenu ref={innerRef}>

@@ -84,9 +84,9 @@ class NotesApp extends React.Component<Props> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    if (!this.props.activeNote && !this.state.currentNote && this.props) {
-      this.setState({currentNote: defaultValue})
-    }
+    // if (!this.props.activeNote && !this.state.currentNote && this.props) {
+    //   this.setState({currentNote: defaultValue})
+    // }
     // if (!this.state.currentNote && this.props.activeNote && this.props.activeNote.value) {
     //   this.setState({currentNote: Value.fromJSON(this.props.activeNote.value)})
     // }
@@ -94,6 +94,13 @@ class NotesApp extends React.Component<Props> {
   componentDidMount() {
     this.updateWindowDimensions()
     window.addEventListener('resize', this.updateWindowDimensions)
+    if (!this.props.activeNote && !this.state.currentNote && this.props) {
+      this.setState({currentNote: defaultValue})
+      console.log('should set default')
+    } else if (this.props.activeNote && !this.state.currentNote) {
+      this.setState({currentNote: Value.fromJSON(this.props.activeNote.value)})
+      console.log('using current')
+    }
   }
 
   componentWillUnmount = () => {
@@ -196,7 +203,7 @@ class NotesApp extends React.Component<Props> {
     )
   }
   public render(): React.ReactNode {
-    const el = document.getElementById('main') || {}
+    const el = document.getElementById('app') || {}
     const menuWidth = this.state.width > 1000 ? '30%' : '300px'
 
     return (
@@ -213,13 +220,8 @@ class NotesApp extends React.Component<Props> {
             showSyncIssue={this.props.showSyncIssue}
           />
         </div>
-        <div style={{display: 'flex', flex: 1, justifyContent: 'center', alignContent: 'center', overflow: 'scroll' }}>
+        <div style={{display: 'flex', flex: 1, zIndex: 10, justifyContent: 'center', alignContent: 'center', overflow: 'scroll' }}>
           {this.getNotePad()}
-        </div>
-        <div style={{display: 'flex', flexDirection: 'row', margin: 0, background: 'none'}}>
-          <div style={{width: '96vw', maxWidth: '100%', paddingLeft: '2vw', paddingBottom: '2vw', background: 'none'}} >
-              {this.syncWarning()}
-          </div>
         </div>
 
         <div>
@@ -262,6 +264,9 @@ class NotesApp extends React.Component<Props> {
               </div>
           </div>
         </Modal>
+        <div style={{position: 'absolute', bottom: '2vw', left: '4vw', background: 'none'}} >
+          {this.syncWarning()}
+        </div>
       </div>
     )
   }

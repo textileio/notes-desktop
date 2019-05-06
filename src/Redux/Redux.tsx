@@ -3,7 +3,6 @@ import { createAction, ActionType, getType } from 'typesafe-actions'
 import { RootState } from './Types'
 import { Value, ValueJSON, Block } from 'slate'
 import { Md5 } from 'ts-md5/dist/md5'
-import moment = require('moment')
 
 const actions = {
   logout: createAction('app/LOGOUT'),
