@@ -83,23 +83,13 @@ class NotesApp extends React.Component<Props> {
     update: 0
   }
 
-  componentDidUpdate(prevProps: Props) {
-    // if (!this.props.activeNote && !this.state.currentNote && this.props) {
-    //   this.setState({currentNote: defaultValue})
-    // }
-    // if (!this.state.currentNote && this.props.activeNote && this.props.activeNote.value) {
-    //   this.setState({currentNote: Value.fromJSON(this.props.activeNote.value)})
-    // }
-  }
   componentDidMount() {
     this.updateWindowDimensions()
     window.addEventListener('resize', this.updateWindowDimensions)
     if (!this.props.activeNote && !this.state.currentNote && this.props) {
       this.setState({currentNote: defaultValue})
-      console.log('should set default')
     } else if (this.props.activeNote && !this.state.currentNote) {
       this.setState({currentNote: Value.fromJSON(this.props.activeNote.value)})
-      console.log('using current')
     }
   }
 
