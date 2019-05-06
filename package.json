@@ -2,7 +2,8 @@
   "name": "@textile/notes-desktop",
   "version": "1.0.0",
   "description": "Simple React.js UI to sync with Textile Notes mobile app",
-  "main": "index.js",
+  "main": "dist/bundle.js",
+  "types": "dist/main.d.ts",
   "scripts": {
     "start": "webpack-dev-server  --mode development --inline --hot --open",
     "build": "webpack  --mode development",
@@ -32,8 +33,7 @@
     "slate-auto-exit-block": "^1.1.0",
     "slate-react": "^0.21.21",
     "ts-md5": "^1.2.4",
-    "typesafe-actions": "^4.1.2",
-    "xxhash": "^0.2.4"
+    "typesafe-actions": "^4.1.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",

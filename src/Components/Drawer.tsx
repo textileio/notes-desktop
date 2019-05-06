@@ -24,7 +24,7 @@ export default class SlidingMenu extends React.Component<ScreenProps, object> {
     const dfrom = from || 'right'
     const directionClass = `slide-pane_from_${dfrom}`
     const modalStyle = { ...style, width: width || '80%' }
-    const el = document.getElementById('main') || {}
+    const el = document.getElementById('app') || {}
     return (
       <Modal
         appElement={el}

@@ -44,7 +44,7 @@ class QRCodeInvite extends React.Component<Props> {
     )
   }
   render() {
-    const el = document.getElementById('main') || {}
+    const el = document.getElementById('app') || {}
     return (
       <Modal
         appElement={el}
