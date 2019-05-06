@@ -18,7 +18,7 @@ import { Value } from 'slate'
 
 import './Components/Styles/Styles.css'
 
-const menuStyle = {background: '#2935ff', color: 'white', display: 'flex'}
+const menuStyle = {background: '#2935ff', zIndex: 1000, color: 'white', display: 'flex'}
 const areaStyle = {width: '96vw', maxWidth: '100%', padding: '2vw' }
 const buttonStyle = {background: '#2935ff', padding: 5, color: 'white', marginRight: 4, cursor: 'pointer'}
 const modalStyle: Modal.Styles = {
@@ -183,13 +183,11 @@ class NotesApp extends React.Component<Props> {
       color: '#2b2b2b'
     }
     return (
-      <div>
-        <NoteArea
-          value={this.state.currentNote}
-          onChange={this.updateCurrentNote}
-          style={textAreaStyle}
-        />
-      </div>
+      <NoteArea
+        value={this.state.currentNote}
+        onChange={this.updateCurrentNote}
+        style={textAreaStyle}
+      />
     )
   }
   public render(): React.ReactNode {
@@ -198,11 +196,12 @@ class NotesApp extends React.Component<Props> {
 
     return (
       <div style={{display: 'flex', flexDirection: 'column', padding: 0, margin: 0}}>
-        <div style={{display: 'flex', flexDirection: 'row', margin: 0, zIndex: 100}}>
+        <div style={{display: 'flex', flexDirection: 'row', margin: 0, zIndex: 1010}}>
           <Menu
             style={areaStyle}
             buttonStyle={buttonStyle}
             requiresSave={this.props.requiresSave}
+            requiresSync={this.props.requiresSync}
             saveAndSelectNote={this.saveAndSelectNote}
             toggleDrawer={this.toggleDrawer}
             clearNote={this.clearNote}
@@ -210,25 +209,23 @@ class NotesApp extends React.Component<Props> {
             showSyncIssue={this.props.showSyncIssue}
           />
         </div>
-        <div style={{display: 'flex', flex: 1, zIndex: 10, justifyContent: 'center', alignContent: 'center', overflow: 'scroll' }}>
+        <div style={{display: 'flex', flex: 1, justifyContent: 'center', alignContent: 'center', overflow: 'scroll' }}>
           {this.getNotePad()}
         </div>
 
-        <div>
-          <RightDrawer
-            isOpen={this.state.isDrawerOpen}
-            name={this.props.name}
-            width={menuWidth}
-            style={menuStyle}
-            onClose={() => {
-              this.setState({ isDrawerOpen: false })
-            }}
-            pairingRequest={this.displayQRCode}
-            selectNote={this.selectNote}
-            showQRCodeLink={!this.props.showSyncIssue}
-            logout={this.logout}
-          />
-        </div>
+        <RightDrawer
+          isOpen={this.state.isDrawerOpen}
+          name={this.props.name}
+          width={menuWidth}
+          style={menuStyle}
+          onClose={() => {
+            this.setState({ isDrawerOpen: false })
+          }}
+          pairingRequest={this.displayQRCode}
+          selectNote={this.selectNote}
+          showQRCodeLink={!this.props.showSyncIssue}
+          logout={this.logout}
+        />
 
         <QRCodeInvite
           onDismiss={() => { this.setState({displayQRCode: false}) }}
@@ -267,6 +264,7 @@ interface UIProps extends AppState {
   showModal: boolean
   modalText: string
   requiresSave: boolean
+  requiresSync: boolean
 }
 
 const mapStateToProps = (state: RootState): UIProps => {
@@ -281,8 +279,10 @@ const mapStateToProps = (state: RootState): UIProps => {
                  Click ignore to run in offline mode.'
     showModal = true
   }
+  console.log(state.app.activeNote)
+  const requiresSync = state.app.activeNote && state.app.activeNote.block ? false : true
   const requiresSave = state.app.activeNote && !state.app.activeNote.saved || false
-  return { ...state.app, modalText, showModal, showSyncIssue, requiresSave}
+  return { ...state.app, modalText, showModal, showSyncIssue, requiresSave, requiresSync}
 }
 
 interface ScreenDispatch {

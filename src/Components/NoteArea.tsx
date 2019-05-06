@@ -62,20 +62,18 @@ class NoteArea extends React.Component<TextAreaProps> {
 
   render() {
     return (
-      <div>
-        <Editor
-          autoFocus={true}
-          placeholder={'Enter some text...'}
-          value={this.props.value}
-          onChange={this.onChange}
-          renderNode={this.renderNode}
-          renderEditor={this.renderEditor}
-          renderMark={this.renderMark}
-          style={this.props.style}
-          className={'text'}
-          plugins={Plugins}
-        />
-      </div>
+      <Editor
+        autoFocus={true}
+        placeholder={'Enter some text...'}
+        value={this.props.value}
+        onChange={this.onChange}
+        renderNode={this.renderNode}
+        renderEditor={this.renderEditor}
+        renderMark={this.renderMark}
+        style={this.props.style}
+        className={'text'}
+        plugins={Plugins}
+      />
     )
   }
 

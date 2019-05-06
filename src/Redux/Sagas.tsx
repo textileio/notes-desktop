@@ -118,12 +118,12 @@ function* saveNoteSaga(action: ActionType<typeof AppActions.saveNote>) {
 
   const updatedNotes = [...notes.filter((note) => note.key !== activeNote.key), activeNote]
   yield put(AppActions.setNotes(updatedNotes))
+  yield put(AppActions.saveNoteSuccess())
 
   if (activeNote.refBlock) {
     yield call(removeBlock, activeNote.refBlock)
   }
   yield call(addNoteToThread, activeNote)
-  yield put(AppActions.saveNoteSuccess())
 }
 
 function * createOrUpdateThreadSaga() {
