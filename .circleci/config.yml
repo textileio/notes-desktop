@@ -21,7 +21,7 @@ jobs:
       - run:
           name: build
           command: |
-            yarn build --macos --windows --linux
+            yarn build --macos
       - run:
           name: collect artifacts
           command: |
@@ -31,7 +31,7 @@ jobs:
             fi
             OUT=~/output
             mkdir -p ${OUT}
-            mv ~/project/Notes-${VERSION}.{dmg,pkg,exe,AppImage} ${OUT}/
+            mv ~/project/release/Notes-${VERSION}.{dmg,pkg,exe,AppImage} ${OUT}/
       - persist_to_workspace:
           root: ~/
           paths:
