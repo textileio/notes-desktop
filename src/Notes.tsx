@@ -212,21 +212,21 @@ class NotesApp extends React.Component<Props> {
         <div style={{display: 'flex', flex: 1, justifyContent: 'center', alignContent: 'center', overflow: 'scroll' }}>
           {this.getNotePad()}
         </div>
-
-        <RightDrawer
-          isOpen={this.state.isDrawerOpen}
-          name={this.props.name}
-          width={menuWidth}
-          style={menuStyle}
-          onClose={() => {
-            this.setState({ isDrawerOpen: false })
-          }}
-          pairingRequest={this.displayQRCode}
-          selectNote={this.selectNote}
-          showQRCodeLink={!this.props.showSyncIssue}
-          logout={this.logout}
-        />
-
+        <div>
+          <RightDrawer
+            isOpen={this.state.isDrawerOpen}
+            name={this.props.name}
+            width={menuWidth}
+            style={menuStyle}
+            onClose={() => {
+              this.setState({ isDrawerOpen: false })
+            }}
+            pairingRequest={this.displayQRCode}
+            selectNote={this.selectNote}
+            showQRCodeLink={!this.props.showQRCodeLink}
+            logout={this.logout}
+          />
+        </div>
         <QRCodeInvite
           onDismiss={() => { this.setState({displayQRCode: false}) }}
           isOpen={this.state.displayQRCode}
@@ -265,10 +265,12 @@ interface UIProps extends AppState {
   modalText: string
   requiresSave: boolean
   requiresSync: boolean
+  showQRCodeLink: boolean
 }
 
 const mapStateToProps = (state: RootState): UIProps => {
   const showSyncIssue = state.app.connection === 'failure'
+  const showQRCodeLink = state.app.connection === 'success'
   let showModal = false
   let modalText = ''
   if (state.app.connection === 'failure' && state.app.sessions === 0) {
@@ -279,16 +281,16 @@ const mapStateToProps = (state: RootState): UIProps => {
                  Click ignore to run in offline mode.'
     showModal = true
   }
-  console.log(state.app.activeNote)
   const requiresSync = state.app.activeNote && state.app.activeNote.block ? false : true
   const requiresSave = state.app.activeNote && !state.app.activeNote.saved || false
-  return { ...state.app, modalText, showModal, showSyncIssue, requiresSave, requiresSync}
+  return { ...state.app, modalText, showModal, showSyncIssue, requiresSave, requiresSync, showQRCodeLink}
 }
 
 interface ScreenDispatch {
   updateCurrentNote: (currentNote: Value) => void
   saveNote: () => void
   selectNote: (note: Note) => void
+  fetchNewNote: (blockId: string) => void
   clearNote: () => void
   deleteNote: () => void
   logout: () => void
@@ -297,6 +299,7 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>): ScreenDispatch => {
   return {
     updateCurrentNote: (currentNote: Value) => dispatch(AppActions.updateActiveNote(currentNote)),
     selectNote: (note: Note) => dispatch(AppActions.selectNote(note)),
+    fetchNewNote: (blockId: string) => dispatch(AppActions.fetchNewNote(blockId)),
     saveNote: () => dispatch(AppActions.saveNote()),
     clearNote: () => dispatch(AppActions.clearNote()),
     deleteNote: () => dispatch(AppActions.deleteNote()),

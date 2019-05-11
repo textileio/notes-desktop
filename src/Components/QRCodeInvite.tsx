@@ -54,10 +54,8 @@ class QRCodeInvite extends React.Component<Props> {
       >
         <div style={{flex: 1, flexDirection: 'column', maxWidth: 300, alignContent: 'center', justifyContent: 'center'}}>
           <div className={'text'} style={{overflow: 'wrap', textAlign: 'center'}}>
-            Install <a href='https://medium.com/textileio/textile-notes-a-minimalist-tool-for-your-creative-ideas-68b9357d5cd0' target='_blank' >
-            Textile Notes
-            </a>
-            on your mobile phone. After successfully installing and onboarding, point your phone's native camera at the QR code below.
+            {/* tslint:disable-next-line */}
+            Install <a href='https://medium.com/textileio/textile-notes-a-minimalist-tool-for-your-creative-ideas-68b9357d5cd0' target='_blank' >Textile Notes</a> on your mobile phone. After successfully installing and onboarding, point your phone's native camera at the QR code below.
           </div>
           <div style={{padding: 20, display: 'flex', flex: 1, flexDirection: 'row', alignContent: 'center', justifyContent: 'center'}}>
             {this.renderQR()}

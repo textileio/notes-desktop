@@ -3,7 +3,7 @@ import AppActions, { AppSelectors, Note } from './Redux'
 import { ActionType } from 'typesafe-actions'
 import textile, { ThreadList, Thread, FileIndex, FilesList } from '@textile/js-http-client'
 
-const notesAppKey = 'io.textile.notes_desktop_primary_v1'
+export const notesAppKey = 'io.textile.notes.desktop-primary.v0.0.1'
 
 const notesSchema = {
   name: 'io.textile.notes_primary_v0.0.1',
@@ -40,6 +40,7 @@ const rootSaga = function* root() {
     fork(initTextile),
     fork(getDisplayNameRequest),
     fork(createOrUpdateThread),
+    fork(fetchNewNote),
     fork(saveNote),
     fork(deleteNote),
     fork(connectionPolling)
@@ -60,6 +61,9 @@ function* saveNote() {
 }
 function* createOrUpdateThread() {
   yield takeLatest('app/CreateOrUpdateThread', createOrUpdateThreadSaga)
+}
+function* fetchNewNote() {
+  yield takeLatest('app/FetchNewNote', fetchNewNoteSaga)
 }
 
 // MARK - Start of core Sagas
@@ -128,13 +132,13 @@ function* saveNoteSaga(action: ActionType<typeof AppActions.saveNote>) {
 
 function * createOrUpdateThreadSaga() {
   try {
-    const threads: ThreadList = yield call([textile.threads, 'list'])
-    const appThread = threads.items.filter((thread: Thread) => thread.key === notesAppKey)
-    if (appThread.length) {
+    const appThread = yield call([textile.threads, 'getByKey'], notesAppKey)
+    // const appThread = threads.items.filter((thread: Thread) => thread.key === notesAppKey)
+    if (appThread) {
       // store app thread
       console.info('INFO -- existing app thread found')
-      yield put(AppActions.setThreadId(appThread[0].id))
-      yield call(refreshStoredNotes, appThread[0].id)
+      yield put(AppActions.setThreadId(appThread.id))
+      yield call(refreshStoredNotes, appThread.id)
     } else {
       console.info('INFO -- initializing app thread')
       const newSchema: FileIndex = yield call([textile.schemas, 'add'], notesSchema)
@@ -219,6 +223,17 @@ function * fetchNoteFromFile(entry: any) {
   const fileData = yield call([textile.file, 'content'], files[0].file.hash)
   const note = JSON.parse(fileData)
   return {...note, block}
+}
+
+function * fetchNewNoteSaga() {
+  // @todo: this could be improved by using the incoming block id instead
+  const threadId = yield select(AppSelectors.appThreadId)
+  // grab the full set from the thread
+  const noteEntries: FilesList = yield call([textile.files, 'list'], threadId, '', 2)
+  for (const file of noteEntries.items) {
+    const note = yield call(fetchNoteFromFile, file)
+    yield put(AppActions.addOrUpdate(note))
+  }
 }
 
 // Combines current Redux with stored Thread state to get latest Notes on startup
