@@ -1,6 +1,9 @@
 # Build files
 dist/
+build/
 .cache
+release-builds/
+release/
 
 # Logs
 logs
